@@ -21,10 +21,10 @@ mvnw.cmd
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-
+HELP.md
 ### VS Code ###
 .vscode/
-
+.gitignore
 ### Mac OS ###
 .DS_Store
 
