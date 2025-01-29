@@ -19,7 +19,7 @@ class DroolsDemoApplicationTests {
 
         //Fact对象，事实对象
         Order order = new Order();
-        order.setAmout(300);
+        order.setAmout(1300);
 
         //将Order对象插入到工作内存中
         session.insert(order);
