@@ -1,13 +1,53 @@
 //订单积分规则
 package com.example.droolsdemo
 import com.example.droolsdemo.pojo.Order
-
+import org.drools.core.phreak.PropagationEntry
+import org.mvel2.ast.Or
+//成功匹配到规则0：原本金额为0 更新为新的order 金额为60.0
+//执行insert(order)
+//成功匹配到规则一：100元以下 不加分
+//成功匹配到规则一：100元以下 不加分
+//成功匹配到规则二：100元 - 500元 加100分
+//成功匹配到规则二：100元 - 500元 加100分
+//订单金额：150.0，添加积分：100.0
+/*
+这种情况发生是因为规则的循环触发。让我解释下执行过程：
+第一轮：
+规则0匹配(amout==0)，创建新Order(金额60)并insert
+规则1匹配(amout<100)，把金额改为150并update
+规则2匹配(amout在100-500之间)，添加积分并update
+第二轮(由于update触发)：
+规则1再次匹配金额150的订单
+规则2再次匹配更新后的订单
+*/
+//update
 //规则一：100元以下 不加分
+//100以下设置到150 更新（重新进行规则匹配，再跑一遍drl）
+//insert 建议别用
+//插入数据并重新进行规则匹配 生成一个新的订单对象
+//retract
+//删除数据 重新匹配
+rule "order_rule_0"
+     salience 100  // 设置较高优先级
+     no-loop //防止死循环
+    when
+    //等于要 ==
+        $order:Order(amout == 10)
+    then
+        Order order = new Order();
+        order.setAmout(60);
+        System.out.println("成功匹配到规则0：原本金额为0 更新为新的order 金额为"+order.getAmout());
+        insert(order);
+        System.out.println("执行insert(order)");
+end
 rule "order_rule_1"
+    salience 90
     when
         $order:Order(amout < 100)
     then
-        $order.setScore(0);
+        $order.setAmout(150);
+        update($order);
+//        $a.setScore(0);
         System.out.println("成功匹配到规则一：100元以下 不加分");
 end
 
